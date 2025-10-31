@@ -1,6 +1,10 @@
 # Projeto: Semáforo com Programação Orientada a Objetos (POO)
 ## Drive: [# Sema-oro-inteligente](https://drive.google.com/drive/u/1/folders/1Nmn5LsAPqJI6xFHJ_UC1l1caeklS3qKI)
+
 ##  Objetivo da atividade
+
+![IMG_8374](https://github.com/user-attachments/assets/c963579e-e91c-4eef-a4d3-2676dcac668d)
+
 
 Desenvolver um sistema de semáforo funcional utilizando três LEDs (verde, amarelo e vermelho) controlados por um Arduino Uno, aplicando conceitos de Programação Orientada a Objetos (POO) em C++.
 O objetivo principal é compreender o uso de classes, objetos e ponteiros, além de controlar a sequência de acendimento dos LEDs de forma automatizada.
