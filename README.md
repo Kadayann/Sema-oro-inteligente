@@ -35,3 +35,108 @@ Através de ponteiros e máquina de estados, o programa alterna automaticamente 
 Tive dificuldade para conectar corretamente os jumpers, garantindo que cada fio estivesse na linha certa da protoboard.
 
 Também tive dificuldade para posicionar os resistores no lugar correto e escolher a resistência ideal (valor de voltagem adequado para não queimar os LEDs).
+
+## Código com POO e Ponteios
+
+```cpp
+
+#include <Arduino.h>
+
+/* ===== Classe led ===== */
+class led {
+  private:
+    uint8_t pin;
+  public:
+    led(uint8_t p) : pin(p) {}
+    void begin() { pinMode(pin, OUTPUT); off(); }
+    void on()    { digitalWrite(pin, HIGH); }
+    void off()   { digitalWrite(pin, LOW);  }
+    void set(bool value) { digitalWrite(pin, value ? HIGH : LOW); }
+};
+
+/* ===== Classe trafficLight ===== */
+class trafficLight {
+  private:
+    led* green;
+    led* yellow;
+    led* red;
+
+    enum state { greenOn, yellowOn, redOn };
+    state currentState;
+
+    unsigned long greenTimeMs;
+    unsigned long yellowTimeMs;
+    unsigned long redTimeMs;
+
+    unsigned long lastChangeMs;
+
+    void switchTo(state next) {
+      green->off();
+      yellow->off();
+      red->off();
+
+      if (next == greenOn)  green->on();
+      if (next == yellowOn) yellow->on();
+      if (next == redOn)    red->on();
+
+      currentState = next;
+      lastChangeMs = millis();
+    }
+
+  public:
+    trafficLight(led* g, led* y, led* r,
+                 unsigned long greenTime=3000,
+                 unsigned long yellowTime=800,
+                 unsigned long redTime=3000)
+      : green(g), yellow(y), red(r),
+        greenTimeMs(greenTime), yellowTimeMs(yellowTime), redTimeMs(redTime),
+        currentState(redOn), lastChangeMs(0) {}
+
+    void begin() {
+      green->begin();
+      yellow->begin();
+      red->begin();
+      switchTo(greenOn);
+    }
+
+    void update() {
+      unsigned long now = millis();
+      switch (currentState) {
+        case greenOn:
+          if (now - lastChangeMs >= greenTimeMs) switchTo(yellowOn);
+          break;
+        case yellowOn:
+          if (now - lastChangeMs >= yellowTimeMs) switchTo(redOn);
+          break;
+        case redOn:
+          if (now - lastChangeMs >= redTimeMs) switchTo(greenOn);
+          break;
+      }
+    }
+
+    void setTimings(unsigned long g, unsigned long y, unsigned long r) {
+      greenTimeMs = g;
+      yellowTimeMs = y;
+      redTimeMs = r;
+    }
+};
+
+/* ===== Instâncias ===== */
+led greenLed(6);
+led yellowLed(7);
+led redLed(8);
+
+trafficLight* semaforo; // ponteiro para o semáforo
+
+void setup() {
+  // aloca o objeto dinamicamente
+  semaforo = new trafficLight(&greenLed, &yellowLed, &redLed, 3000, 800, 3000);
+  semaforo->begin();
+}
+
+void loop() {
+  semaforo->update();
+}
+
+```
+
